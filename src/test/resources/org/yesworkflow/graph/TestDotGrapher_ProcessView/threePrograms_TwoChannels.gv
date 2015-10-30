@@ -1,0 +1,29 @@
+
+/* Start of top-level graph */
+digraph Workflow {
+rankdir=LR
+
+/* Start of double cluster for drawing box around nodes in workflow */
+subgraph cluster_workflow_box_outer { label=""; color=black; penwidth=2
+subgraph cluster_workflow_box_inner { label=""; color=white
+
+/* Style for nodes representing atomic programs in workflow */
+node[shape=box style=filled fillcolor="#CCFFCC" peripheries=1 fontname=Courier]
+
+/* Nodes representing atomic programs in workflow */
+program0
+program1
+program2
+
+/* Style for edges representing channels between programs in workflow */
+edge[fontname=Helvetica]
+
+/* Edges representing channels between programs in workflow */
+program0 -> program1 [label=channel0]
+program0 -> program2 [label=channel1]
+
+/* End of double cluster for drawing box around nodes in workflow */
+}}
+
+/* End of top-level graph */
+}

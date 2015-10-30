@@ -1,0 +1,120 @@
+
+/******************************************* H2 Notes ************************************************* 
+
+- Primary key columns are of type IDENTITY which are 64-bit integers guaranteed to be unique.
+  See http://h2database.com/html/datatypes.html#identity_type
+
+- Foreign keys are given type BIGINT which are also 64 bits.
+  See http://h2database.com/html/datatypes.html#bigint_type.
+  
+- Text fields are given type VARCHAR.  No size is given because H2 allocates space dynamically
+  with the optional size qualification used only as a constraint.
+  See http://h2database.com/html/datatypes.html#varchar_type
+   
+**************************************************************************************************/
+
+CREATE TABLE source (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    path                VARCHAR         NULL
+);
+
+CREATE TABLE source_line (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    source              BIGINT          NOT NULL        REFERENCES source(id),
+    line_number         BIGINT          NOT NULL,
+    line_text           VARCHAR         NOT NULL
+);
+
+CREATE TABLE comment (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    source              BIGINT          NOT NULL        REFERENCES source(id),
+    line_number         BIGINT          NOT NULL,
+    rank_in_line        BIGINT          NOT NULL,
+    comment_text        VARCHAR         NOT NULL
+);
+
+CREATE TABLE annotation (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    qualifies           BIGINT          NULL            REFERENCES annotation(id),
+    comment             BIGINT          NOT NULL        REFERENCES comment(id),
+    rank_in_comment     BIGINT          NOT NULL,
+    tag                 VARCHAR         NOT NULL,
+    keyword             VARCHAR         NOT NULL,
+    value               VARCHAR         NOT NULL,
+    description         VARCHAR         NULL
+);
+
+CREATE TABLE program_block (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    in_program_block    BIGINT          NULL            REFERENCES program_block(id),
+    begin_annotation    BIGINT          NULL            REFERENCES annotation(id),
+    end_annotation      BIGINT          NULL            REFERENCES annotation(id),
+    name                VARCHAR         NOT NULL        DEFAULT '',
+    qualified_name      VARCHAR         NOT NULL        DEFAULT '',
+    is_workflow         TINYINT         NOT NULL        DEFAULT 0,
+    is_function         TINYINT         NOT NULL        DEFAULT 0
+);
+
+CREATE TABLE code_block (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    begin_line          BIGINT          NULL,
+    end_line            BIGINT          NULL,
+    name                VARCHAR         NOT NULL        DEFAULT '',
+    description         VARCHAR         NULL            DEFAULT ''
+);
+
+CREATE TABLE signature (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    input_or_output     VARCHAR         NOT NULL        DEFAULT '',
+    variable            VARCHAR         NULL            DEFAULT '',
+    alias               VARCHAR         NULL            DEFAULT '',
+    uri                 VARCHAR         NULL            DEFAULT '',
+    in_code_block       VARCHAR         NOT NULL        DEFAULT ''
+);
+
+CREATE TABLE data (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    in_program_block    BIGINT          NULL,
+    name                VARCHAR         NOT NULL,
+    qualified_name      VARCHAR         NOT NULL,
+);
+
+CREATE TABLE port (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    port_annotation     BIGINT          NULL            REFERENCES annotation(id),
+    on_program_block    BIGINT          NOT NULL        REFERENCES program_block(id),
+    data                BIGINT          NOT NULL        REFERENCES data(id),
+    name                VARCHAR         NOT NULL,
+    qualified_name      VARCHAR         NOT NULL,
+    alias               VARCHAR         NULL,
+    uri_template        VARCHAR         NULL,
+    is_inport           TINYINT         NOT NULL,
+    is_outport          TINYINT         NOT NULL
+);
+
+CREATE TABLE channel (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    out_port            BIGINT          NOT NULL        REFERENCES port(id),
+    in_port             BIGINT          NOT NULL        REFERENCES port(id),
+    data                BIGINT          NOT NULL        REFERENCES data(id),
+    is_inflow           TINYINT         NOT NULL,
+    is_outflow          TINYINT         NOT NULL
+);
+
+CREATE TABLE uri_variable (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    port                BIGINT          NOT NULL        REFERENCES port(id),
+    name                VARCHAR         NOT NULL
+);
+
+CREATE TABLE resource (
+    id                  IDENTITY        NOT NULL        PRIMARY KEY,
+    data                BIGINT          NOT NULL        REFERENCES data(id),
+    uri                 VARCHAR         NOT NULL
+);
+
+CREATE TABLE uri_variable_value (
+    uri_variable        BIGINT          NOT NULL        REFERENCES uri_variable(id),
+    resource            IDENTITY        NOT NULL        REFERENCES resource(id),
+    value               VARCHAR         NOT NULL
+);

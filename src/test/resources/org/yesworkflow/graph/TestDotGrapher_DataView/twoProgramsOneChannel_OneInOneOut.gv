@@ -1,0 +1,25 @@
+
+/* Start of top-level graph */
+digraph Workflow {
+rankdir=LR
+
+/* Start of double cluster for drawing box around nodes in workflow */
+subgraph cluster_workflow_box_outer { label=""; color=black; penwidth=2
+subgraph cluster_workflow_box_inner { label=""; color=white
+
+/* Style for nodes representing parameter and non-parameter data channels in workflow */
+node[shape=box style="rounded,filled" fillcolor="#FFFFCC" peripheries=1 fontname=Helvetica]
+
+/* Nodes representing parameter and non-parameter data channels in workflow */
+channel
+
+/* Style for edges representing programs connecting data channels in workflow */
+edge[fontname=Courier]
+
+/* Edges representing programs connecting data channels in workflow */
+
+/* End of double cluster for drawing box around nodes in workflow */
+}}
+
+/* End of top-level graph */
+}
