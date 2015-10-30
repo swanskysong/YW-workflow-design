@@ -236,18 +236,19 @@ public class DefaultCreator implements Creator {
             System.out.println("Code block: " + sb.toString() + " cannot be created");
         }
 
+        // create file if there is at least one @CREATE block
+        if(create_rows.size() != 0) {
+            try {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    bw.write(line + "\n");
+                }
+                if (br != null) br.close();
+                if (bw != null) bw.close();
+            } catch (IOException e) {}
 
-        try {
-            String line;
-            while ((line = br.readLine()) != null) {
-                bw.write(line + "\n");
-            }
-            if(br != null) br.close();
-            if(bw != null) bw.close();
-        } catch (IOException e) {}
-
-        File newFile = new File(createdFile);
-        System.out.println("File created as " + createdFile);
-
+            File newFile = new File(createdFile);
+            System.out.println("File created as " + createdFile);
+        }
     }
 }

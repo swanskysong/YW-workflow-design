@@ -166,42 +166,42 @@ public class DefaultExtractor implements Extractor {
         writeSkeletonFile();
         extractCodeBlock();
 
-        System.out.println("extracting");
-
-        System.out.println("COMMENT");
-        System.out.println(ywdb.jooq().select()
-                .from(Table.COMMENT)
-                .fetch());
-
-        System.out.println("ANNOTATION");
-        System.out.println(ywdb.jooq().select()
-                .from(Table.ANNOTATION)
-                .fetch());
-
-        System.out.println("CODE_BLOCK");
-        System.out.println(ywdb.jooq().select()
-                .from(Table.CODE_BLOCK)
-                .fetch());
-
-        System.out.println("SIGNATURE");
-        System.out.println(ywdb.jooq().select()
-                .from(Table.SIGNATURE)
-                .fetch());
-
-        System.out.println("P_CODE_BLOCK");
-        System.out.println(pdb.jooq().select()
-                .from(Table.CODE_BLOCK)
-                .fetch());
-
-        System.out.println("P_SIGNATURE");
-        System.out.println(pdb.jooq().select()
-                .from(Table.SIGNATURE)
-                .fetch());
-
-        System.out.println("P_CODE_SNIPPET");
-        System.out.println(pdb.jooq().select()
-                .from(Table.CODE_SNIPPET)
-                .fetch());
+//        System.out.println("extracting");
+//
+//        System.out.println("COMMENT");
+//        System.out.println(ywdb.jooq().select()
+//                .from(Table.COMMENT)
+//                .fetch());
+//
+//        System.out.println("ANNOTATION");
+//        System.out.println(ywdb.jooq().select()
+//                .from(Table.ANNOTATION)
+//                .fetch());
+//
+//        System.out.println("CODE_BLOCK");
+//        System.out.println(ywdb.jooq().select()
+//                .from(Table.CODE_BLOCK)
+//                .fetch());
+//
+//        System.out.println("SIGNATURE");
+//        System.out.println(ywdb.jooq().select()
+//                .from(Table.SIGNATURE)
+//                .fetch());
+//
+//        System.out.println("P_CODE_BLOCK");
+//        System.out.println(pdb.jooq().select()
+//                .from(Table.CODE_BLOCK)
+//                .fetch());
+//
+//        System.out.println("P_SIGNATURE");
+//        System.out.println(pdb.jooq().select()
+//                .from(Table.SIGNATURE)
+//                .fetch());
+//
+//        System.out.println("P_CODE_SNIPPET");
+//        System.out.println(pdb.jooq().select()
+//                .from(Table.CODE_SNIPPET)
+//                .fetch());
 
         if (ywdb.getRowCount(ANNOTATION) == 0) {
             stderrStream.println("WARNING: No YW comments found in source code.");
@@ -222,7 +222,15 @@ public class DefaultExtractor implements Extractor {
                 .orderBy(COMMENT_ID)
                 .fetch();
 
-        // the order of @begin, @in, @as must be maintained
+        // Get a list of exciting code blocks in the persistent database in order to avoid duplicated blocks
+        // todo: how find existing code blocks with signature
+        Result<Record> existing_rows = pdb.jooq().select(NAME)
+                .from(Table.CODE_BLOCK)
+                .fetch();
+        HashSet<String> existing_blocks = new HashSet<>();
+        for(Record existing_row : existing_rows) existing_blocks.add(ywdb.getStringValue(existing_row, NAME));
+
+        // the order of @begin, @in, @as in the annotated script must be maintained
         String block_name = null;
         String block_tag = null;
         Signature sig = null;
@@ -255,7 +263,7 @@ public class DefaultExtractor implements Extractor {
                     else System.out.println("tag: " + line_tag + " is neither BEGIN nor END in extractCodeBlock");
                 }
 
-                if(tag.equals(Tag.BEGIN.toString())){
+                if(tag.equals(Tag.BEGIN.toString()) && !existing_blocks.contains(block_name)){
                     pdb.insertCodeBlock(begin_line, end_line, block_name, null);
                     Result<Record> code_rows = ywdb.jooq().select(LINE_NUMBER, LINE_TEXT)
                             .from(Table.SOURCE_LINE)
