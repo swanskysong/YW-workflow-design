@@ -8,11 +8,11 @@
     </organization>
 
     <groupId>org.yesworkflow</groupId>
-    <artifactId>yesworkflow</artifactId>
+    <artifactId>workflow-design</artifactId>
     <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>YesWorkflow Prototype</name>
-    <url>https://github.com/yesworkflow-org/yw-prototypes</url>
+    <name>YesWorkflow workflow design prototype</name>
+    <url>https://github.com/swanskysong/yw-workflow-design</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

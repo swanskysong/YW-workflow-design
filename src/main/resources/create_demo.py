@@ -11,10 +11,10 @@ from matplotlib.backends.backend_pdf import PdfPages
     # @OUT standardized_NEE_data
 
     # @END standardize_with_mask
-XXXX
-YYYYY
+Code pieces a
+Code pieces b
 
-ZZZZ
+Code pieces c
 # @CREATE simple_diagnose
 # @PARAM fmodel
 # @IN standardized_NEE_data
@@ -22,10 +22,10 @@ ZZZZ
 #
 # @END simple_diagnose
 
-ppopoad
+Code pieces d
 # @CREATE load_data
 # @PARAM db_pth
-# @IN input_data_file
-# @OUT data
+# @IN not_vaid
+# @OUT not_GOOD
 
 # @END load_data
